@@ -1,11 +1,16 @@
-import { Heart, MapPin, BedDouble, Maximize2 } from "lucide-react";
-import { useState } from "react";
+import { Heart, MapPin, BedDouble, Maximize2, GitCompareArrows } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Property } from "@/data/properties";
 import { Badge } from "@/components/ui/badge";
+import { useFavorites } from "@/contexts/FavoritesContext";
+import { useCompare } from "@/contexts/CompareContext";
+import { toast } from "@/hooks/use-toast";
 
 const PropertyCard = ({ property }: { property: Property }) => {
-  const [liked, setLiked] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const { isComparing, toggleCompare, compareIds } = useCompare();
+  const liked = isFavorite(property.id);
+  const comparing = isComparing(property.id);
 
   const formatPrice = (price: number) => {
     if (price >= 1000000) return `${(price / 1000000).toFixed(1)}M ₺`;
@@ -30,17 +35,35 @@ const PropertyCard = ({ property }: { property: Property }) => {
             {property.type === "sale" ? "Satılık" : "Kiralık"}
           </Badge>
         </div>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            setLiked(!liked);
-          }}
-          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center transition-colors hover:bg-background"
-        >
-          <Heart
-            className={`h-4 w-4 transition-colors ${liked ? "fill-destructive text-destructive" : "text-muted-foreground"}`}
-          />
-        </button>
+        <div className="absolute top-3 right-3 flex gap-1.5">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              if (!comparing && compareIds.length >= 3) {
+                toast({ title: "En fazla 3 ilan karşılaştırabilirsiniz", variant: "destructive" });
+                return;
+              }
+              toggleCompare(property.id);
+              toast({ title: comparing ? "Karşılaştırmadan çıkarıldı" : "Karşılaştırmaya eklendi" });
+            }}
+            className={`w-9 h-9 rounded-full backdrop-blur-sm flex items-center justify-center transition-colors ${
+              comparing ? "bg-primary text-primary-foreground" : "bg-background/80 hover:bg-background"
+            }`}
+          >
+            <GitCompareArrows className="h-4 w-4" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              toggleFavorite(property.id);
+            }}
+            className="w-9 h-9 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center transition-colors hover:bg-background"
+          >
+            <Heart
+              className={`h-4 w-4 transition-colors ${liked ? "fill-destructive text-destructive" : "text-muted-foreground"}`}
+            />
+          </button>
+        </div>
       </div>
 
       <div className="p-5">

@@ -20,7 +20,7 @@ const HeroSection = () => {
         >
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-primary-foreground mb-6 leading-tight">
             Hayalinizdeki{" "}
-            <span className="bg-gradient-accent bg-clip-text text-transparent">
+            <span className="text-gradient-accent">
               Evi
             </span>{" "}
             Bulun
