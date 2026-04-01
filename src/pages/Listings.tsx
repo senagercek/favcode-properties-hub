@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { SlidersHorizontal, Grid3X3, List } from "lucide-react";
+import { Map, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
 import PropertyCard from "@/components/PropertyCard";
+import PropertyMap from "@/components/PropertyMap";
 import { properties } from "@/data/properties";
 
 const Listings = () => {
@@ -13,6 +14,7 @@ const Listings = () => {
   const [city, setCity] = useState("all");
   const [rooms, setRooms] = useState("all");
   const [sort, setSort] = useState("newest");
+  const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
 
   const filtered = useMemo(() => {
     let result = [...properties];
@@ -35,13 +37,34 @@ const Listings = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            className="flex items-center justify-between mb-2"
           >
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-              Tüm <span className="text-gradient-primary">İlanlar</span>
-            </h1>
-            <p className="text-muted-foreground mb-8">
-              {filtered.length} ilan bulundu
-            </p>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+                Tüm <span className="text-gradient-primary">İlanlar</span>
+              </h1>
+              <p className="text-muted-foreground mb-8">
+                {filtered.length} ilan bulundu
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant={viewMode === "grid" ? "default" : "outline"}
+                onClick={() => setViewMode("grid")}
+                className={viewMode === "grid" ? "bg-gradient-primary text-primary-foreground" : ""}
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant={viewMode === "map" ? "default" : "outline"}
+                onClick={() => setViewMode("map")}
+                className={viewMode === "map" ? "bg-gradient-primary text-primary-foreground" : ""}
+              >
+                <Map className="h-4 w-4" />
+              </Button>
+            </div>
           </motion.div>
 
           <div className="flex flex-wrap gap-3 mb-8 p-4 bg-card rounded-2xl shadow-card">
@@ -92,20 +115,24 @@ const Listings = () => {
             </select>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((property, i) => (
-              <motion.div
-                key={property.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.05 }}
-              >
-                <PropertyCard property={property} />
-              </motion.div>
-            ))}
-          </div>
+          {viewMode === "map" ? (
+            <PropertyMap properties={filtered} />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filtered.map((property, i) => (
+                <motion.div
+                  key={property.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: i * 0.05 }}
+                >
+                  <PropertyCard property={property} />
+                </motion.div>
+              ))}
+            </div>
+          )}
 
-          {filtered.length === 0 && (
+          {viewMode === "grid" && filtered.length === 0 && (
             <div className="text-center py-20 text-muted-foreground">
               <p className="text-lg">Seçilen filtrelere uygun ilan bulunamadı.</p>
             </div>

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Phone } from "lucide-react";
+import { Menu, X, Phone, Heart, GitCompareArrows } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useFavorites } from "@/contexts/FavoritesContext";
+import { useCompare } from "@/contexts/CompareContext";
 import logo from "@/assets/logo.png";
 
 const navItems = [
@@ -14,6 +16,8 @@ const navItems = [
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { favorites } = useFavorites();
+  const { compareIds } = useCompare();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -38,8 +42,30 @@ const Header = () => {
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-3">
-          <Button variant="outline" size="sm" className="gap-2">
+        <div className="hidden md:flex items-center gap-2">
+          <Link
+            to="/karsilastir"
+            className="relative w-9 h-9 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-secondary transition-colors"
+          >
+            <GitCompareArrows className="h-5 w-5" />
+            {compareIds.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-accent text-accent-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
+                {compareIds.length}
+              </span>
+            )}
+          </Link>
+          <Link
+            to="/favoriler"
+            className="relative w-9 h-9 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-secondary transition-colors"
+          >
+            <Heart className="h-5 w-5" />
+            {favorites.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
+                {favorites.length}
+              </span>
+            )}
+          </Link>
+          <Button variant="outline" size="sm" className="gap-2 ml-1">
             <Phone className="h-4 w-4" />
             <span>0850 123 45 67</span>
           </Button>
@@ -48,13 +74,23 @@ const Header = () => {
           </Button>
         </div>
 
-        <button
-          className="md:hidden p-2"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Menü"
-        >
-          {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        <div className="md:hidden flex items-center gap-2">
+          <Link to="/favoriler" className="relative p-2">
+            <Heart className="h-5 w-5 text-muted-foreground" />
+            {favorites.length > 0 && (
+              <span className="absolute top-0 right-0 w-4 h-4 bg-gradient-primary text-primary-foreground text-[9px] font-bold rounded-full flex items-center justify-center">
+                {favorites.length}
+              </span>
+            )}
+          </Link>
+          <button
+            className="p-2"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Menü"
+          >
+            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
 
       {isOpen && (
@@ -74,6 +110,13 @@ const Header = () => {
                 {item.label}
               </Link>
             ))}
+            <Link
+              to="/karsilastir"
+              onClick={() => setIsOpen(false)}
+              className="text-sm font-medium py-2 text-muted-foreground"
+            >
+              Karşılaştır ({compareIds.length})
+            </Link>
             <Button size="sm" className="bg-gradient-primary text-primary-foreground mt-2">
               Talep Gönder
             </Button>
