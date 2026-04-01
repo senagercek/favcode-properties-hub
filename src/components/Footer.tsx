@@ -13,7 +13,7 @@ const Footer = () => {
               Modern emlak çözümleriyle hayalinizdeki eve ulaşmanızı sağlıyoruz. Güvenilir, hızlı ve profesyonel hizmet.
             </p>
             <div className="flex gap-3">
-              {[Instagram, Twitter, Linkedin, Facebook].map((Icon, i) => (
+              {[Globe, MessageCircle, Briefcase, Heart].map((Icon, i) => (
                 <a
                   key={i}
                   href="#"
